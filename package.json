@@ -1,0 +1,10 @@
+{
+  "name": "grpc-example",
+  "version": "1.0.0",
+  "description": "gRPC learning project with Todo and Calendar microservices",
+  "private": true,
+  "scripts": {
+    "start:calendar": "pnpm --filter calendar-service start",
+    "start:todo": "pnpm --filter todo-service start"
+  }
+}
