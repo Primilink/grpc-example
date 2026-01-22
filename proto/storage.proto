@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package storage;
+
+service StorageService {
+  rpc UploadFile(stream FileChunk) returns (UploadResponse);    // client streaming
+  rpc DownloadFile(DownloadRequest) returns (stream FileChunk); // server streaming
+}
+
+message FileChunk {
+  bytes data = 1;
+  string filename = 2;  // only set in first chunk
+  string mime_type = 3; // only set in first chunk
+}
+
+message UploadResponse {
+  string file_id = 1;
+  string filename = 2;
+  int64 size = 3;
+  bool success = 4;
+}
+
+message DownloadRequest {
+  string file_id = 1;
+}

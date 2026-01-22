@@ -20,6 +20,18 @@ importers:
         specifier: ^4.18.0
         version: 4.22.1
 
+  storage-service:
+    dependencies:
+      '@grpc/grpc-js':
+        specifier: ^1.9.0
+        version: 1.14.3
+      '@grpc/proto-loader':
+        specifier: ^0.7.0
+        version: 0.7.15
+      express:
+        specifier: ^4.18.0
+        version: 4.22.1
+
   todo-service:
     dependencies:
       '@grpc/grpc-js':
