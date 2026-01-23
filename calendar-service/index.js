@@ -93,6 +93,13 @@ function startHttpServer() {
     res.json({ events });
   });
 
+  // POST /events - create event (for benchmark comparison)
+  app.post('/events', (req, res) => {
+    const { title, description, date } = req.body;
+    const event = createEvent(title, description || '', date);
+    res.status(201).json({ eventId: event.eventId, success: true });
+  });
+
   app.listen(HTTP_PORT, () => {
     console.log(`Calendar REST API running on http://localhost:${HTTP_PORT}`);
   });

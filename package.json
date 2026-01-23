@@ -5,6 +5,12 @@
   "private": true,
   "scripts": {
     "start:calendar": "pnpm --filter calendar-service start",
-    "start:todo": "pnpm --filter todo-service start"
+    "start:storage": "pnpm --filter storage-service start",
+    "start:todo": "pnpm --filter todo-service start",
+    "benchmark": "node benchmark.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.0"
   }
 }

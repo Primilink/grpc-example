@@ -347,6 +347,57 @@ This project demonstrates two streaming patterns:
 | **Client Streaming** | `UploadFile` | Client sends multiple chunks, server responds once |
 | **Server Streaming** | `DownloadFile` | Client sends one request, server streams chunks back |
 
+## Benchmarks
+
+> **Note:** These benchmarks run on localhost with Node.js (pure JS gRPC implementation). Real-world results over an actual network would show even larger differences due to gRPC's smaller payloads and binary serialization. Production services in Go/Rust/C++ would see greater gains.
+
+### Sequential Requests (1,000 iterations)
+
+```bash
+pnpm benchmark
+```
+
+| Metric | gRPC | REST | Winner |
+|--------|------|------|--------|
+| Avg Latency | 2.12ms | 2.20ms | gRPC |
+| P95 Latency | 2.76ms | 2.84ms | gRPC |
+| Payload Size | ~38 bytes | 71 bytes | gRPC (1.9x smaller) |
+
+*Similar performance on localhost - the real difference shows under load!*
+
+### Concurrent Requests (10,000 requests, 1,000 concurrent)
+
+```bash
+node benchmark-concurrent.js
+```
+
+| Metric | gRPC | REST | Diff |
+|--------|------|------|------|
+| Total Time | 6.4s | 9.1s | **43% faster** |
+| Requests/sec | 1,564 | 1,095 | **+43% throughput** |
+| Avg Latency | 625ms | 891ms | **30% lower** |
+| P99 Latency | 1.4s | 2.2s | **37% lower** |
+
+### Why gRPC Wins Under Load
+
+```
+REST (HTTP/1.1)                    gRPC (HTTP/2)
+┌─────────────────┐               ┌─────────────────┐
+│ Request 1 ──────┼──► TCP #1     │ Request 1 ──────┤
+│ Request 2 ──────┼──► TCP #2     │ Request 2 ──────┤
+│ Request 3 ──────┼──► TCP #3     │ Request 3 ──────┼──► TCP #1
+│ Request 4 ──────┼──► TCP #4     │ Request 4 ──────┤   (multiplexed)
+│ Request 5 ──────┼──► TCP #5     │ Request 5 ──────┤
+└─────────────────┘               └─────────────────┘
+    5 connections                     1 connection
+    5x TCP handshakes                 1x TCP handshake
+    Connection overhead               Multiplexed streams
+```
+
+- **HTTP/2 Multiplexing**: All requests share ONE TCP connection
+- **Binary Protocol**: Protobuf is smaller and faster to parse than JSON
+- **No Head-of-Line Blocking**: Streams are independent within the connection
+
 ## Dependencies
 
 - `express` - REST API framework

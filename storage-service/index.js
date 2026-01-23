@@ -122,8 +122,16 @@ function startGrpcServer() {
 function startHttpServer() {
   const app = express();
 
+  // POST /files - upload file (for benchmark comparison)
+  app.post('/files', express.raw({ type: '*/*', limit: '10mb' }), (req, res) => {
+    const filename = req.headers['x-filename'] || `upload-${Date.now()}.bin`;
+    const mimeType = req.headers['content-type'] || 'application/octet-stream';
+    const file = saveFile(filename, mimeType, req.body);
+    res.status(201).json({ fileId: file.fileId, filename: file.filename, size: file.size });
+  });
+
   // GET /files - list all files
-  app.get('/files', (req, res) => {
+  app.get('/files', (_req, res) => {
     const files = getAllFiles();
     res.json({ files });
   });
